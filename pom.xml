@@ -5,7 +5,7 @@
     <artifactId>significance-showcase</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <properties>
-        <elasticsearch.version>2.0.0-SNAPSHOT</elasticsearch.version>
+        <elasticsearch.version>1.1.1</elasticsearch.version>
         <lucene.version>4.7.2</lucene.version>
         <jackson.version>2.3.2</jackson.version>
         <es.logger.level>INFO</es.logger.level>
@@ -22,7 +22,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>${lucene.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>
@@ -70,7 +70,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>16.0</version>
-            <scope>test,compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

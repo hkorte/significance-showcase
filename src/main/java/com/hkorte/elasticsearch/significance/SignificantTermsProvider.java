@@ -1,20 +1,21 @@
 package com.hkorte.elasticsearch.significance;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.hkorte.elasticsearch.significance.measures.*;
 import com.hkorte.elasticsearch.significance.model.ScoredTerm;
 import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.cache.CacheBuilder;
+import org.elasticsearch.common.cache.CacheLoader;
+import org.elasticsearch.common.cache.LoadingCache;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestChannel;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.XContentRestResponse;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.rest.RestStatus.OK;
+import static org.elasticsearch.rest.action.support.RestXContentBuilder.restContentBuilder;
 
 /**
  * Created by hkorte on 25.04.14.
@@ -68,8 +70,8 @@ public class SignificantTermsProvider {
 		});
 	}
 
-	public void writeSignificantTerms(RestChannel channel, String[] indices, String[] types, String field, int size,
-									  String query) throws IOException, ExecutionException {
+	public void writeSignificantTerms(RestRequest request, RestChannel channel, String[] indices, String[] types,
+			String field, int size, String query) throws IOException, ExecutionException {
 
 		Map<String, Integer> dfMap = this.globalDocFreqCache.get(new FieldIdentifier(indices, types, field));
 		long numDocs = this.globalDocCountCache.get(new TypeIdentifier(indices, types));
@@ -136,7 +138,7 @@ public class SignificantTermsProvider {
 				}
 			}
 
-			XContentBuilder builder = channel.newBuilder();
+			XContentBuilder builder = restContentBuilder(request);
 			builder.startObject();
 			for (SignificanceMeasureResults significanceMeasureResults : resultsList) {
 				builder.startArray(significanceMeasureResults.significanceMeasure.shortName());
@@ -155,7 +157,7 @@ public class SignificantTermsProvider {
 			}
 			builder.endObject();
 
-			channel.sendResponse(new BytesRestResponse(OK, builder));
+			channel.sendResponse(new XContentRestResponse(request, OK, builder));
 		}
 	}
 
@@ -179,7 +181,7 @@ public class SignificantTermsProvider {
 		}
 
 		public void update(String term, long n00, long n01, long n10, long n11) {
-			ScoredTerm scoredTerm = this.significanceMeasure.apply(n11, n10, n01, n00);
+			ScoredTerm scoredTerm = this.significanceMeasure.apply(n00, n01, n10, n11);
 			scoredTerm.setTerm(term);
 			this.priorityQueue.insertWithOverflow(scoredTerm);
 		}
