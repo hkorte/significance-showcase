@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>The Significance Showcase Elasticsearch Plugin</title>
+
+	<meta name="description" content="Significance Showcase tutorial slides">
+	<meta name="author" content="Hannes Korte">
+
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/theme.css">
+	<link rel="stylesheet" href="css/customfonts.css">
+
+	<!-- For syntax highlighting -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<!--[if lt IE 9]>
+	<script src="lib/js/html5shiv.js"></script>    <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+<div class="slides">
+
+	<section>
+		<h3 style="margin-bottom: 100px;">
+			<small>The</small><br/>
+			Significance Showcase<br/>
+			<small>Elasticsearch Plugin</small>
+		</h3>
+		<div>
+			Hannes Korte<br/>
+			<small>email@hkorte.com</small>
+		</div>
+		<div style="margin-top: 80px;">
+			<small>Elasticsearch Usergroup Berlin Meetup 2014-04-29</small>
+		</div>
+	</section>
+
+	<section>
+		<h3>Motivation</h3>
+		<div>Classical count-ordered term facets generate stop words on full-text fields:</div>
+		<pre><code class="json" contenteditable>
+			"terms": [
+            {
+               "term": "of",
+               "count": 14142
+            },
+            {
+               "term": "the",
+               "count": 13806
+            },
+            {
+               "term": "in",
+               "count": 13625
+            },
+            {
+               "term": "and",
+               "count": 13600
+            },
+			...
+		</code></pre>
+	</section>
+
+	<section>
+		<h3>Motivation (2)</h3>
+		<div>We want dynamic word-clouds consisting of significant terms correlated to the current search result!</div>
+		<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Foundation-l_word_cloud_without_headers_and_quotes.png/800px-Foundation-l_word_cloud_without_headers_and_quotes.png"/>
+	</section>
+
+	<section>
+		<h3>Different flavours of significance</h3>
+		<ul>
+			<li class="fragment">ES Heuristic used in SignificantTermsAggregation</li>
+			<li class="fragment">Mutual Information</li>
+			<li class="fragment">$\mathcal{X}^2$  Chi-squared test</li>
+			<li class="fragment">Kullback-Leibler Divergence</li>
+			<li class="fragment">...</li>
+		</ul>
+	</section>
+
+	<section>
+		<h3>Code Example: Chi-squared</h3>
+		<pre><code class="java" contenteditable>  /**
+   * @param n00 docs which do not contain word with negative class
+   * @param n01 docs which do not contain word with positive class
+   * @param n10 docs which contain word with negative class
+   * @param n11 docs which contain word with positive class
+   * @return The Chi-squared test result of the given distribution
+   */
+   @Override
+   public double compute(long n00, long n01, long n10, long n11) {
+      // add +1 for smoothing and to avoid division by zero
+      n00++; n01++; n10++; n11++;
+      return ((n11+n10+n01+n00) * Math.pow(n11*n00 - n10*n01, 2)) /
+		     ((n11+n01) * (n11+n10) * (n10+n00) * (n01+n00));
+   }</code></pre>
+	</section>
+
+	<section>
+		<h3>Installation</h3>
+		<ul>
+			<li>As this plugin is not a pure _site plugin, we have cannot simply use the github installation shortcut.</li>
+			<li>To do it right, we would have to deploy a release to maven central.</li>
+			<li>We did it the direct way: gh-pages</li>
+		</ul>
+			<pre><code class="shell" contenteditable>bin/plugin --url http://hkorte.github.io/significance-showcase/stable.zip \
+           --install significance-showcase</code></pre>
+	</section>
+
+	<section>
+		<h3>Usage: Request</h3>
+		<pre><code class="javascript" contenteditable>POST /wikipedia/page/_significance
+{
+    "query": {
+        "match": {
+		    "text": "geek"
+        }
+    },
+    "field": "text",
+    "size": 10
+}</code></pre>
+	</section>
+
+	<section>
+		<h3>Usage: Response</h3>
+		<pre><code class="javascript" contenteditable>{
+   "default": [
+      {
+         "term": "geek",
+         "score": 722,
+         "n00": 18050,
+         "n01": 0,
+         "n10": 0,
+         "n11": 25,
+         "subsetProbability": 1,
+         "supersetProbability": 0.0013831258644536654,
+         "absoluteProbabilityChange": 0.9986168741355463,
+         "relativeProbabilityChange": 723
+      },
+      {
+         "term": "nerds",
+         "score": 65.52727272727275,
+         "n00": 18044,
+         "n01": 20,
+         "n10": 6,
+         "n11": 5,
+         "subsetProbability": 0.2,
+         "supersetProbability": 0.0006085753803596127,
+         "absoluteProbabilityChange": 0.1993914246196404,
+         "relativeProbabilityChange": 328.6363636363637
+      },
+      {
+         "term": "cosplay",
+         "score": 35.433846153846154,
+         "n00": 18041,
+         "n01": 21,
+         "n10": 9,
+         "n11": 4,
+         "subsetProbability": 0.16,
+         "supersetProbability": 0.0007192254495159059,
+         "absoluteProbabilityChange": 0.1592807745504841,
+         "relativeProbabilityChange": 222.46153846153848
+      }
+   ],
+   "mi": [
+      {
+         "term": "geek",
+         "score": 0.014968935346494364,
+         "n00": 18050,
+         "n01": 0,
+         "n10": 0,
+         "n11": 25
+      },
+      {
+         "term": "nerds",
+         "score": 0.0024575965051602095,
+         "n00": 18044,
+         "n01": 20,
+         "n10": 6,
+         "n11": 5
+      },
+      {
+         "term": "video",
+         "score": 0.0020564057622244735,
+         "n00": 16312,
+         "n01": 8,
+         "n10": 1738,
+         "n11": 17
+      }
+   ],
+   ...
+}</code></pre>
+	</section>
+
+	<section>
+		<h3>Usage: _site</h3>
+		<div>There is also a site plugin available at<br/>
+			<a href="http://localhost:9200/_plugin/significance-showcase/">http://localhost:9200/_plugin/significance-showcase/</a>
+		</div>
+	</section>
+
+	<section>
+		<div style="margin-bottom: 100px; font-size: 150%;">Thanks!</div>
+		<div style="margin-bottom: 100px;">
+			<center>
+				<table>
+					<tr>
+						<td></td>
+						<td>Hannes Korte</td>
+					</tr>
+					<tr style="font-size: smaller">
+						<td><i class="icon-mail"></i></td>
+						<td>email@hkorte.com</td>
+					</tr>
+					<tr style="font-size: smaller">
+						<td><i class="icon-github-circled"></i></td>
+						<td>hkorte</td>
+					</tr>
+				</table>
+			</center>
+		</div>
+		<div id="references" style="font-size: smaller">
+			Image taken from:<br/>
+			<a href="http://en.wikipedia.org/wiki/File:Foundation-l_word_cloud_without_headers_and_quotes.png">http://en.wikipedia.org/wiki/File:Foundation-l_word_cloud_without_headers_and_quotes.png</a>
+		</div>
+	</section>
+
+</div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+	// Full list of configuration options available here:
+	// https://github.com/hakimel/reveal.js#configuration
+	Reveal.initialize({
+		controls: true,
+		progress: true,
+		history: true,
+		center: true,
+
+		transition: 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+		// Optional libraries used to extend on reveal.js
+		dependencies: [
+			{
+				src: 'lib/js/classList.js',
+				condition: function () {
+					return !document.body.classList;
+				}
+			},
+			{
+				src: 'plugin/markdown/marked.js',
+				condition: function () {
+					return !!document.querySelector('[data-markdown]');
+				}
+			},
+			{
+				src: 'plugin/markdown/markdown.js',
+				condition: function () {
+					return !!document.querySelector('[data-markdown]');
+				}
+			},
+			{
+				src: 'plugin/highlight/highlight.js',
+				async: true,
+				callback: function () {
+					hljs.initHighlightingOnLoad();
+				}
+			},
+			{
+				src: 'plugin/zoom-js/zoom.js',
+				async: true,
+				condition: function () {
+					return !!document.body.classList;
+				}
+			},
+			{
+				src: 'plugin/notes/notes.js',
+				async: true,
+				condition: function () {
+					return !!document.body.classList;
+				}
+			},
+			{
+				src: 'plugin/math/math.js',
+				async: true
+			}
+		]
+	});
+</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/customstuff.js"></script>
+
+</body>
+</html>
