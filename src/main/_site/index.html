@@ -10,7 +10,7 @@
 
 <div ng-app="SignificanceShowcase" ng-controller="MainController">
 
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<div class="panel panel-default">
 			<div class="panel-heading">Current request</div>
 			<div class="panel-body">
@@ -40,8 +40,7 @@
 			</div>
 		</div>
 	</div>
-	<!--<select ng-model="selectedIndex" ng-options="obj.name for obj in indices"></select>-->
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<div class="panel panel-default">
 			<div class="panel-heading">Selected term stats</div>
 			<table class="table selectedTerm" ng-show="selectedTerm != null">
@@ -133,7 +132,7 @@
 			</table>
 		</div>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-8">
 		<div class="panel panel-default">
 			<div class="panel-heading">Significance measures overview</div>
 			<table class="table" ng-show="table.length > 0" id="termTable">

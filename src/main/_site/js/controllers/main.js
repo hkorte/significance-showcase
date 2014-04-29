@@ -1,9 +1,9 @@
 app.controller("MainController", function($scope, $http){
-	$scope.selectedIndex = "spiegel";
-	$scope.selectedType = "document";
-	$scope.selectedField = "content";
+	$scope.selectedIndex = "wikipedia";
+	$scope.selectedType = "page";
+	$scope.selectedField = "text";
 	$scope.selectedSize = 15;
-	$scope.query = "{\n\t\"query_string\": {\n\t\t\"default_field\": \"content\",\n\t\t\"query\": \"autofahren\"\n\t}\n}";
+	$scope.query = "{\n\t\"query_string\": {\n\t\t\"default_field\": \"text\",\n\t\t\"query\": \"geek\"\n\t}\n}";
 	$scope.results = {};
 	$scope.termStats = {};
 	$scope.table = [];
