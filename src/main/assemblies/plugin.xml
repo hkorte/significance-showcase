@@ -15,4 +15,21 @@
             </excludes>
         </dependencySet>
     </dependencySets>
+
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/src/main/_site</directory>
+            <outputDirectory>_site</outputDirectory>
+            <excludes>
+                <exclude>.idea/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>_site</outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 </assembly>

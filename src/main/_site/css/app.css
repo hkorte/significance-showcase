@@ -1,0 +1,26 @@
+body {
+    padding-top: 10px;
+}
+
+table.selectedTerm tr.desc td {
+    padding-top: 0px;
+    border-top: 0px;
+    font-size: small;
+}
+
+table.selectedTerm td.value {
+    font-weight: bold;
+    font-style: italic;
+    text-align: right;
+}
+
+table#termTable tr td {
+    cursor: default;
+}
+
+table#termTable tr td:hover {
+    background: rgb(210, 210, 210);
+    background: -moz-linear-gradient(top, rgb(255, 255, 255), rgb(224, 224, 224)) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left top, left bottom, from(rgb(255, 255, 255)), to(rgb(224, 224, 224)));
+    outline: 2px solid #606060;
+}

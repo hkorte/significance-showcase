@@ -40,10 +40,6 @@ public class SignificanceShowcaseRestHandler extends BaseRestHandler {
 		this.logger = Loggers.getLogger(getClass(), settings);
 		this.significantTermsProvider = new SignificantTermsProvider(settings, client);
 
-		controller.registerHandler(GET, "/_significance", this);
-		controller.registerHandler(POST, "/_significance", this);
-		controller.registerHandler(GET, "/{index}/_significance", this);
-		controller.registerHandler(POST, "/{index}/_significance", this);
 		controller.registerHandler(GET, "/{index}/{type}/_significance", this);
 		controller.registerHandler(POST, "/{index}/{type}/_significance", this);
 

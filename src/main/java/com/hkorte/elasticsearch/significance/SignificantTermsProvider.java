@@ -179,7 +179,7 @@ public class SignificantTermsProvider {
 		}
 
 		public void update(String term, long n00, long n01, long n10, long n11) {
-			ScoredTerm scoredTerm = this.significanceMeasure.apply(n11, n10, n01, n00);
+			ScoredTerm scoredTerm = this.significanceMeasure.apply(n00, n01, n10, n11);
 			scoredTerm.setTerm(term);
 			this.priorityQueue.insertWithOverflow(scoredTerm);
 		}
