@@ -5,6 +5,8 @@ The Significance Showcase is a simple Elasticsearch plugin to easily visualize d
 
 You can install this plugin to Elasticsearch using this command:
 
-```bin/plugin --url http://hkorte.github.io/significance-showcase/stable.zip --install significance-showcase```
+On ES 1.1.1:
+```bin/plugin --url http://hkorte.github.io/significance-showcase/es-1.1.1.zip --install significance-showcase```
 
-This is the stable release for the current stable Elasticsearch release - and is up-to-date, hopefully ;)
+On ES 1.2.0:
+```bin/plugin --url http://hkorte.github.io/significance-showcase/es-1.2.0.zip --install significance-showcase```
